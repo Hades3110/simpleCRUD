@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { userSchema } from '../schematics/userSchema';
 import { User } from '../types';
 
 let users: User[] = [];
@@ -9,6 +10,13 @@ export const getUsers = (req, res) => {
 
 export const createUser = (req, res) => {
     const body = req.body;
+
+    const validationError = userSchema.validate(body).error;
+
+    if(validationError){
+        res.status(400).send(validationError);
+        return;
+    }
 
     const newUser: User = {
         id: uuid(),
@@ -46,13 +54,22 @@ export const deleteUser = (req, res) => {
 
 export const updateUser =  (req,res) => {
     const id = req.params.id;
+    const body = req.body;
+
+    const validationError = userSchema.validate(body).error;
+
+    if(validationError){
+        res.status(400).send(validationError);
+        return;
+    }
+
     users = users.map(user => {
         if(id === user.id){
             return {
                 ...user,
-                login: req.body.login,
-                age: req.body.age,
-                password: req.body.password,
+                login: body.login,
+                age: body.age,
+                password: body.password,
             };
         }
         return user;
