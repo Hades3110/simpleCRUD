@@ -14,8 +14,7 @@ export const createUser = (req, res) => {
     const validationError = userSchema.validate(body).error;
 
     if(validationError){
-        res.status(400).send(validationError);
-        return;
+        return res.status(400).send(validationError);
     }
 
     const newUser: User = {
@@ -35,8 +34,7 @@ export const getUser = (req, res) => {
     const id = req.params.id;
     const user = users.find((user) => user.id === id);
     if(user) {
-        res.send(user);
-        return;
+        return res.send(user);
     }
     res.status(404).send(`user ${id} not found`);
 };
@@ -45,8 +43,7 @@ export const deleteUser = (req, res) => {
     const id = req.params.id;
     const user = users.find((user) => user.id === id);
     if(!user) {
-        res.status(404).send(`user ${id} not found`);
-        return;
+        return res.status(404).send(`user ${id} not found`);
     }
     user.isDeleted = true;
     res.status(200).send(user);
@@ -59,8 +56,7 @@ export const updateUser =  (req,res) => {
     const validationError = userSchema.validate(body).error;
 
     if(validationError){
-        res.status(400).send(validationError);
-        return;
+        return res.status(400).send(validationError);
     }
 
     users = users.map(user => {
