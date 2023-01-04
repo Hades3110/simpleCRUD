@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import type { User } from './types';
 
 export class UserService {
-    users: User[];
+    users: User[] = [];
 
     addUser(login: string, password: string, age: number) {
         const newUser: User = {
