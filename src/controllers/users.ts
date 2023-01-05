@@ -1,75 +1,50 @@
-import { v4 as uuid } from 'uuid';
-import { userSchema } from '../schematics/userSchema';
-import { User } from '../types';
+import { UserService } from '../services/userService';
+import { StatusCode } from '../types';
 
-let users: User[] = [];
+const userService = new UserService();
 
-export const getUsers = (req, res) => {
-    res.send(users.sort((a, b) => a.login.localeCompare(b.login)));
+export const getUsers = async (req, res) => {
+    const users = await userService.getAll();
+    res.send(users);
 };
 
-export const createUser = (req, res) => {
+export const createUser = async (req, res) => {
     const body = req.body;
 
-    const validationError = userSchema.validate(body).error;
+    const newUser = await userService.addUser(body.login, body.password, body.age);
 
-    if(validationError){
-        return res.status(400).send(validationError);
-    }
-
-    const newUser: User = {
-        id: uuid(),
-        isDeleted: false,
-        login: body.login,
-        password: body.password,
-        age: body.age,
-    };
-
-    users.push(newUser);
-
-    res.status(201).send(newUser);
+    res.status(StatusCode.CREATED).send(newUser);
 };
 
-export const getUser = (req, res) => {
+export const getUser = async (req, res) => {
     const id = req.params.id;
-    const user = users.find((user) => user.id === id);
+    const user = await userService.getUser(id);
+
     if(user) {
         return res.send(user);
     }
-    res.status(404).send(`user ${id} not found`);
+    res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
 };
 
-export const deleteUser = (req, res) => {
+export const deleteUser = async (req, res) => {
     const id = req.params.id;
-    const user = users.find((user) => user.id === id);
-    if(!user) {
-        return res.status(404).send(`user ${id} not found`);
+
+    const isDeleted = await userService.deleteUser(id);
+
+    if(isDeleted) {
+        return res.status(StatusCode.OK).send(`user ${id} deleted`);
     }
-    user.isDeleted = true;
-    res.status(200).send(user);
+    res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
 };
 
-export const updateUser =  (req,res) => {
+export const updateUser = async (req,res) => {
     const id = req.params.id;
     const body = req.body;
 
-    const validationError = userSchema.validate(body).error;
+    const isUpdated = await userService.updateUser(id, body.login, body.password, body.age);
 
-    if(validationError){
-        return res.status(400).send(validationError);
+    if(isUpdated){
+        return res.status(StatusCode.OK).send(`${id} id updated`);
     }
-
-    users = users.map(user => {
-        if(id === user.id){
-            return {
-                ...user,
-                login: body.login,
-                age: body.age,
-                password: body.password,
-            };
-        }
-        return user;
-    });
-
-    res.status(200).send(`${id} id updated`);
+    return res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
 };
