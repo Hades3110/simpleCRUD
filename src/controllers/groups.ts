@@ -11,14 +11,14 @@ export const getGroups = async (req, res) => {
 export const createGroup = async (req, res) => {
     const body = req.body;
 
-    const newGroup = await groupService.addUser(body.name, body.permissions);
+    const newGroup = await groupService.addGroup(body.name, body.permissions);
 
     res.status(StatusCode.CREATED).send(newGroup);
 };
 
 export const getGroup = async (req, res) => {
     const id = req.params.id;
-    const group = await groupService.getUser(id);
+    const group = await groupService.getGroup(id);
 
     if(group) {
         return res.send(group);
@@ -29,7 +29,7 @@ export const getGroup = async (req, res) => {
 export const deleteGroup = async (req, res) => {
     const id = req.params.id;
 
-    const isDeleted = await groupService.deleteUser(id);
+    const isDeleted = await groupService.deleteGroup(id);
 
     if(isDeleted) {
         return res.status(StatusCode.OK).send(`group ${id} deleted`);
@@ -41,7 +41,7 @@ export const updateGroup = async (req,res) => {
     const id = req.params.id;
     const body = req.body;
 
-    const isUpdated = await groupService.updateUser(id, body.name, body.permissions);
+    const isUpdated = await groupService.updateGroup(id, body.name, body.permissions);
 
     if(isUpdated){
         return res.status(StatusCode.OK).send(`${id} id updated`);

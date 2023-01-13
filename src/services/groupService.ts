@@ -4,7 +4,7 @@ import { GroupModel } from '../models';
 import { checkUUID } from '../helpers';
 
 export class GroupService {
-    addUser(name: string, permissions: Permission[]) {
+    addGroup(name: string, permissions: Permission[]) {
         const newGroup: Group = {
             id: uuid(),
             name,
@@ -23,12 +23,12 @@ export class GroupService {
         return groups.map(group => group.dataValues).sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    async getUser(id: string){
+    async getGroup(id: string){
         if(!checkUUID(id)) return null;
         return await GroupModel.findByPk(id);
     }
 
-    async updateUser(id: string, name: string, permissions: Permission[]) {
+    async updateGroup(id: string, name: string, permissions: Permission[]) {
         if(!checkUUID(id)) return null;
         const affectedCount = await GroupModel.update({ name, permissions }, {
             where: { id },
@@ -36,7 +36,7 @@ export class GroupService {
         return !!affectedCount[0];
     }
 
-    async deleteUser(id: string) {
+    async deleteGroup(id: string) {
         if(!checkUUID(id)) return null;
         const isDeleted = await GroupModel.destroy({
             where: { id },
