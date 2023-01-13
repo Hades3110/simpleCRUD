@@ -2,29 +2,25 @@ import type { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { StatusCode } from '../types';
 
-const userSchema = Joi.object({
-    login: Joi.string()
+const groupSchema = Joi.object({
+    name: Joi.string()
         .required()
         .alphanum()
         .min(3)
         .max(10),
-    password: Joi.string()
-        .required()
-        .alphanum(),
-    age: Joi.number()
-        .min(4)
-        .max(130),
+    permissions: Joi.array()
+        .items(Joi.string().valid('READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES'))
+        .required(),
 });
 
-
-export const userValidate = (
+export const groupValidate = (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     const body = req.body;
 
-    const errors = userSchema.validate(body).error;
+    const errors = groupSchema.validate(body).error;
     if(errors){
         return res.status(StatusCode.BAD_REQUEST).send(errors);
     }

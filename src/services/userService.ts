@@ -1,11 +1,9 @@
 import { v4 as uuid } from 'uuid';
 import type { User } from '../types';
-import { UserModel } from '../models/userModel';
-import { checkUUID } from '../middleware/userValidation';
+import { UserModel } from '../models';
+import { checkUUID } from '../helpers';
 
 export class UserService {
-    users: User[] = [];
-
     addUser(login: string, password: string, age: number) {
         const newUser: User = {
             id: uuid(),
@@ -14,8 +12,6 @@ export class UserService {
             password,
             age,
         };
-
-        this.users.push(newUser);
 
         UserModel.create({
             ...newUser,

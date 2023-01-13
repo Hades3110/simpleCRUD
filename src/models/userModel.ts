@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import { UserSequelize } from '../data-access/userDataAccess';
+import { sequelize } from '../data-access';
 
-export const UserModel = UserSequelize.define('User', {
+export const UserModel = sequelize.define('User', {
     login: DataTypes.STRING,
     password: DataTypes.STRING,
     age: DataTypes.INTEGER,

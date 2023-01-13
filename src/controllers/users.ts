@@ -1,4 +1,4 @@
-import { UserService } from '../services/userService';
+import { UserService } from '../services';
 import { StatusCode } from '../types';
 
 const userService = new UserService();
