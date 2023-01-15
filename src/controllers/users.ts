@@ -48,3 +48,15 @@ export const updateUser = async (req,res) => {
     }
     return res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
 };
+
+export const addUserToGroup = async (req, res) => {
+    const userId = req.body.userId;
+    const groupId = req.body.groupId;
+
+    const isUserAdded = userService.addUsersToGroup(groupId,userId);
+
+    if(isUserAdded) {
+        return res.status(StatusCode.OK).send(`user ${userId} added to ${groupId}`);
+    }
+    return res.status(StatusCode.BAD_REQUEST).send('Bad request');
+};
