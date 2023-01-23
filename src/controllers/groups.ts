@@ -3,48 +3,113 @@ import { StatusCode } from '../types';
 
 const groupService = new GroupService();
 
-export const getGroups = async (req, res) => {
-    const groups = await groupService.getAll();
-    res.send(groups);
+export const getGroups = async (req, res, next) => {
+    try {
+        const groups = await groupService.getAll();
+
+        req.calledFunction = {
+            service: 'groupService',
+            method: 'getAll',
+            args: [],
+        };
+
+        res.send(groups);
+    } catch (e) {
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
+    }
+
+    next();
 };
 
-export const createGroup = async (req, res) => {
+export const createGroup = async (req, res, next) => {
     const body = req.body;
 
-    const newGroup = await groupService.addGroup(body.name, body.permissions);
+    try {
+        const newGroup = await groupService.addGroup(body.name, body.permissions);
 
-    res.status(StatusCode.CREATED).send(newGroup);
-};
+        req.calledFunction = {
+            service: 'groupService',
+            method: 'addGroup',
+            args: [body.name, body.permissions],
+        };
 
-export const getGroup = async (req, res) => {
-    const id = req.params.id;
-    const group = await groupService.getGroup(id);
-
-    if(group) {
-        return res.send(group);
+        res.status(StatusCode.CREATED).send(newGroup);
+    } catch (e) {
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
-    res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
+
+    next();
 };
 
-export const deleteGroup = async (req, res) => {
+export const getGroup = async (req, res, next) => {
     const id = req.params.id;
 
-    const isDeleted = await groupService.deleteGroup(id);
+    try {
+        const group = await groupService.getGroup(id);
 
-    if(isDeleted) {
-        return res.status(StatusCode.OK).send(`group ${id} deleted`);
+        req.calledFunction = {
+            service: 'groupService',
+            method: 'getGroup',
+            args: [id],
+        };
+
+        if(group) {
+            res.send(group);
+        } else {
+            res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
+        }
+    } catch (e) {
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
-    res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
+
+    next();
 };
 
-export const updateGroup = async (req,res) => {
+export const deleteGroup = async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        const isDeleted = await groupService.deleteGroup(id);
+
+        req.calledFunction = {
+            service: 'groupService',
+            method: 'deleteGroup',
+            args: [id],
+        };
+
+        if(isDeleted) {
+            res.status(StatusCode.OK).send(`group ${id} deleted`);
+        } else {
+            res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
+        }
+    } catch (e) {
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
+    }
+
+    next();
+};
+
+export const updateGroup = async (req, res, next) => {
     const id = req.params.id;
     const body = req.body;
 
-    const isUpdated = await groupService.updateGroup(id, body.name, body.permissions);
+    try {
+        const isUpdated = await groupService.updateGroup(id, body.name, body.permissions);
 
-    if(isUpdated){
-        return res.status(StatusCode.OK).send(`${id} id updated`);
+        req.calledFunction = {
+            service: 'groupService',
+            method: 'updateGroup',
+            args: [id, body.name, body.permissions],
+        };
+
+        if(isUpdated){
+            res.status(StatusCode.OK).send(`${id} id updated`);
+        } else {
+            res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
+        }
+    } catch (e) {
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
-    return res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
+
+    next();
 };

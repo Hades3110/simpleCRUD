@@ -6,7 +6,7 @@ import { sequelize } from '../data-access';
 import { UsersGroupModel } from '../models/UsersGroupModel';
 
 export class UserService {
-    addUser(login: string, password: string, age: number) {
+    async addUser(login: string, password: string, age: number): Promise<User> {
         const newUser: User = {
             id: uuid(),
             isDeleted: false,
@@ -15,25 +15,25 @@ export class UserService {
             age,
         };
 
-        UserModel.create({
+        await UserModel.create({
             ...newUser,
         });
-
 
         return newUser;
     }
 
-    async getAll (){
+    async getAll (): Promise<User[]> {
         const users = await UserModel.findAll({ where: { isDeleted: false } });
         return users.map(users => users.dataValues).sort((a, b) => a.login.localeCompare(b.login));
     }
 
-    async getUser(id: string){
+    async getUser(id: string): Promise<User> {
         if(!checkUUID(id)) return null;
-        return await UserModel.findByPk(id);
+        const user = await UserModel.findByPk(id);
+        return user.dataValues;
     }
 
-    async updateUser(id: string, login: string, password: string, age: number) {
+    async updateUser(id: string, login: string, password: string, age: number): Promise<boolean> {
         if(!checkUUID(id)) return null;
         const affectedCount = await UserModel.update({ login, age, password }, {
             where: { id },
@@ -41,7 +41,7 @@ export class UserService {
         return !!affectedCount[0];
     }
 
-    async deleteUser(id: string) {
+    async deleteUser(id: string): Promise<boolean> {
         if(!checkUUID(id)) return null;
         const isDeleted = await UserModel.update({ isDeleted: true }, {
             where: { id },
@@ -49,7 +49,7 @@ export class UserService {
         return !!isDeleted;
     }
 
-    async addUsersToGroup (groupId: string, userId: string) {
+    async addUsersToGroup (groupId: string, userId: string): Promise<boolean> {
         if(!checkUUID(groupId) && !checkUUID(userId)) return false;
         try {
             await sequelize.transaction(async (t) => {
