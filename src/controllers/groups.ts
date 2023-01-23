@@ -5,16 +5,17 @@ const groupService = new GroupService();
 
 export const getGroups = async (req, res, next) => {
     try {
-        const groups = await groupService.getAll();
-
         req.calledFunction = {
             service: 'groupService',
             method: 'getAll',
             args: [],
         };
 
+        const groups = await groupService.getAll();
+
         res.send(groups);
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -25,16 +26,17 @@ export const createGroup = async (req, res, next) => {
     const body = req.body;
 
     try {
-        const newGroup = await groupService.addGroup(body.name, body.permissions);
-
         req.calledFunction = {
             service: 'groupService',
             method: 'addGroup',
             args: [body.name, body.permissions],
         };
 
+        const newGroup = await groupService.addGroup(body.name, body.permissions);
+
         res.status(StatusCode.CREATED).send(newGroup);
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -45,13 +47,13 @@ export const getGroup = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const group = await groupService.getGroup(id);
-
         req.calledFunction = {
             service: 'groupService',
             method: 'getGroup',
             args: [id],
         };
+
+        const group = await groupService.getGroup(id);
 
         if(group) {
             res.send(group);
@@ -59,6 +61,7 @@ export const getGroup = async (req, res, next) => {
             res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -69,13 +72,13 @@ export const deleteGroup = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const isDeleted = await groupService.deleteGroup(id);
-
         req.calledFunction = {
             service: 'groupService',
             method: 'deleteGroup',
             args: [id],
         };
+
+        const isDeleted = await groupService.deleteGroup(id);
 
         if(isDeleted) {
             res.status(StatusCode.OK).send(`group ${id} deleted`);
@@ -83,6 +86,7 @@ export const deleteGroup = async (req, res, next) => {
             res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -94,13 +98,13 @@ export const updateGroup = async (req, res, next) => {
     const body = req.body;
 
     try {
-        const isUpdated = await groupService.updateGroup(id, body.name, body.permissions);
-
         req.calledFunction = {
             service: 'groupService',
             method: 'updateGroup',
             args: [id, body.name, body.permissions],
         };
+
+        const isUpdated = await groupService.updateGroup(id, body.name, body.permissions);
 
         if(isUpdated){
             res.status(StatusCode.OK).send(`${id} id updated`);
@@ -108,6 +112,7 @@ export const updateGroup = async (req, res, next) => {
             res.status(StatusCode.NOT_FOUND).send(`group ${id} not found`);
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 

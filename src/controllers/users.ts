@@ -4,7 +4,6 @@ import { StatusCode } from '../types';
 const userService = new UserService();
 
 export const getUsers = async (req, res, next) => {
-    const users = await userService.getAll();
 
     try {
         req.calledFunction = {
@@ -13,8 +12,11 @@ export const getUsers = async (req, res, next) => {
             args: [],
         };
 
+        const users = await userService.getAll();
+
         res.send(users);
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -25,16 +27,17 @@ export const createUser = async (req, res, next) => {
     const body = req.body;
 
     try {
-        const newUser = await userService.addUser(body.login, body.password, body.age);
-
         req.calledFunction = {
             service: 'userService',
             method: 'addUser',
             args: [body.login, body.password, body.age],
         };
 
+        const newUser = await userService.addUser(body.login, body.password, body.age);
+
         res.status(StatusCode.CREATED).send(newUser);
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -45,13 +48,13 @@ export const getUser = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const user = await userService.getUser(id);
-
         req.calledFunction = {
             service: 'userService',
             method: 'getUser',
             args: [id],
         };
+
+        const user = await userService.getUser(id);
 
         if(user) {
             res.send(user);
@@ -59,6 +62,7 @@ export const getUser = async (req, res, next) => {
             res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -69,13 +73,13 @@ export const deleteUser = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const isDeleted = await userService.deleteUser(id);
-
         req.calledFunction = {
             service: 'userService',
             method: 'deleteUser',
             args: [id],
         };
+
+        const isDeleted = await userService.deleteUser(id);
 
         if(isDeleted) {
             res.status(StatusCode.OK).send(`user ${id} deleted`);
@@ -83,6 +87,7 @@ export const deleteUser = async (req, res, next) => {
             res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -94,13 +99,13 @@ export const updateUser = async (req,res, next) => {
     const body = req.body;
 
     try {
-        const isUpdated = await userService.updateUser(id, body.login, body.password, body.age);
-
         req.calledFunction = {
             service: 'userService',
             method: 'updateUser',
             args: [id, body.login, body.password, body.age],
         };
+
+        const isUpdated = await userService.updateUser(id, body.login, body.password, body.age);
 
         if(isUpdated){
             res.status(StatusCode.OK).send(`${id} id updated`);
@@ -108,6 +113,7 @@ export const updateUser = async (req,res, next) => {
             res.status(StatusCode.NOT_FOUND).send(`user ${id} not found`);
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 
@@ -119,13 +125,13 @@ export const addUserToGroup = async (req, res, next) => {
     const groupId = req.body.groupId;
 
     try {
-        const isUserAdded = userService.addUsersToGroup(groupId,userId);
-
         req.calledFunction = {
             service: 'userService',
             method: 'addUsersToGroup',
             args: [groupId, userId],
         };
+
+        const isUserAdded = userService.addUsersToGroup(groupId,userId);
 
         if(isUserAdded) {
             res.status(StatusCode.OK).send(`user ${userId} added to ${groupId}`);
@@ -133,6 +139,7 @@ export const addUserToGroup = async (req, res, next) => {
             res.status(StatusCode.BAD_REQUEST).send('Bad request');
         }
     } catch (e) {
+        req.error = e;
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Internal Server Error');
     }
 

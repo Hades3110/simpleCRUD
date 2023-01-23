@@ -1,4 +1,4 @@
-import winston from 'winston';
+import winston, {error} from 'winston';
 
 const logger = winston.createLogger({
     transports: [
@@ -8,16 +8,23 @@ const logger = winston.createLogger({
 });
 
 interface LoggerRequest extends Request {
-    calledFunction? : {
+    calledFunction : {
         [ name: string ]: unknown[];
     }
+    error? : Error;
 }
 
-export const logInfo = (req: LoggerRequest) => {
-    if(req.calledFunction) {
-        logger.log({
-            level: 'info',
-            message: JSON.stringify(req.calledFunction),
-        });
-    }
+const logError = (error: Error) => {
+    logger.log({
+        level: 'error',
+        message: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+    });
+};
+
+export const log = (req: LoggerRequest) => {
+    logger.log({
+        level: 'info',
+        message: JSON.stringify(req.calledFunction),
+    });
+    if(req.error) logError(req.error);
 };
