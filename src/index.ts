@@ -2,6 +2,7 @@ import express from 'express';
 import * as dotenv from 'dotenv';
 import { usersRoutes, groupsRouter } from './routes';
 import { log } from './middleware/logger';
+import * as process from 'process';
 
 dotenv.config();
 

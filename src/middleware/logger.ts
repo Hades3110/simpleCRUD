@@ -1,4 +1,5 @@
-import winston, {error} from 'winston';
+import process from 'process';
+import winston from 'winston';
 
 const logger = winston.createLogger({
     transports: [
@@ -20,6 +21,10 @@ const logError = (error: Error) => {
         message: JSON.stringify(error, Object.getOwnPropertyNames(error)),
     });
 };
+
+process.on('uncaughtException', (error) => {
+    logError(error);
+});
 
 export const log = (req: LoggerRequest) => {
     logger.log({
