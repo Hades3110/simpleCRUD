@@ -11,6 +11,10 @@ const mockUser = {
     isDeleted: false,
 };
 
+jest.mock('../data-access', () => ({
+    sequelize: new SequelizeMock()
+}));
+
 jest.mock('../models', () => {
     const dbMock = new SequelizeMock();
     return {

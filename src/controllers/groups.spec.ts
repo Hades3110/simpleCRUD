@@ -1,8 +1,11 @@
+import SequelizeMock from 'sequelize-mock';
 import { getGroups, createGroup, getGroup, deleteGroup, updateGroup } from './groups';
 import { GroupService } from '../services';
 import { Group, StatusCode } from '../types';
 
-jest.mock('../services');
+jest.mock('../data-access', () => ({
+    sequelize: new SequelizeMock()
+}));
 
 describe('Group controller', () => {
     let req, res, next;
@@ -27,7 +30,7 @@ describe('Group controller', () => {
                 { id: '1', name: 'Group 1', permissions: [] },
                 { id: '2', name: 'Group 2', permissions: [] },
             ];
-            const getAllSpy = jest.spyOn(GroupService.prototype, 'getAll').mockResolvedValue(groups);
+            const getAllSpy = jest.spyOn(GroupService.prototype, 'getAll').mockImplementation(() => Promise.resolve(groups));
 
             await getGroups(req, res, next);
 

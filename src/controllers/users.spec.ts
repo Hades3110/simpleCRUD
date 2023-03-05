@@ -1,8 +1,11 @@
+import SequelizeMock from 'sequelize-mock';
 import { getUsers, createUser, getUser, deleteUser, updateUser } from './users';
 import { UserService } from '../services';
 import { User, StatusCode } from '../types';
 
-jest.mock('../services');
+jest.mock('../data-access', () => ({
+    sequelize: new SequelizeMock()
+}));
 
 describe('User controller', () => {
     let req, res, next;
