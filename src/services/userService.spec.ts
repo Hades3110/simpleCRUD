@@ -1,3 +1,4 @@
+import SequelizeMock from 'sequelize-mock';
 import { UserService } from './userService';
 import { checkUUID } from '../helpers';
 import { UserModel } from '../models';
@@ -10,7 +11,19 @@ const mockUser = {
     isDeleted: false,
 };
 
-jest.mock('../models');
+jest.mock('../models', () => {
+    const dbMock = new SequelizeMock();
+    return {
+        UserModel: dbMock.define('User', {
+            id: '1',
+            login: 'login',
+            password: 'password',
+            age: 20,
+            isDeleted: false,
+        })
+    };
+});
+
 jest.mock('uuid', () => ({
     v4: jest.fn().mockReturnValueOnce('1')
 }));
