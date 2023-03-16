@@ -15,7 +15,7 @@ export class LoginService {
         const userList = await this.userService.getAll();
 
         const user = userList.find(({login}) => username === login);
-        if(user && user.password === password){
+        if(user.password === password){
             return jwt.sign({ username, password }, this.secretKey);
         }
         return null;
